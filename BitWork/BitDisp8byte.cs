@@ -37,11 +37,115 @@ namespace BitWork
 			get { return m_Value; }
 			set
 			{
-				ValueToBin(value);
-				this.Invalidate();
+				if(m_Value != value)
+				{
+					ValueTo(value);
+					this.Invalidate();
+				}
 			}
 		}
-		private void ValueToBin(ulong value)
+		[Category("BitWork")]
+		public long ValueS
+		{
+			get { return (long)m_Value; }
+			set
+			{
+				ulong s = (ulong)value;
+				if (m_Value != s)
+				{
+					ValueTo(s);
+					this.Invalidate();
+				}
+			}
+		}
+		[Category("BitWork")]
+		public byte ValueByte
+		{
+			get 
+			{
+				return (byte)m_Value; 
+			}
+			set
+			{
+				ulong b = (ulong)value;
+				if (m_Value != b)
+				{
+					ValueTo(b);
+					this.Invalidate();
+				}
+			}
+		}
+		[Category("BitWork")]
+		public sbyte ValueSbyte
+		{
+			get { return (sbyte)m_Value; }
+			set
+			{
+				ulong b = (ulong)value;
+				if (m_Value != b)
+				{
+					ValueTo(b);
+				}
+				Invalidate();
+			}
+		}
+		[Category("BitWork")]
+		public short ValueShort
+		{
+			get { return (short)m_Value; }
+			set
+			{
+				ulong b = (ulong)value;
+				if (m_Value != b)
+				{
+					ValueTo(b);
+				}
+				Invalidate();
+			}
+		}
+		[Category("BitWork")]
+		public ushort ValueUshort
+		{
+			get { return (ushort)m_Value; }
+			set
+			{
+				ulong b = (ulong)value;
+				if (m_Value != b)
+				{
+					ValueTo(b);
+				}
+				Invalidate();
+			}
+		}
+		[Category("BitWork")]
+		public long ValueLong
+		{
+			get { return (long)m_Value; }
+			set
+			{
+				ulong b = (ulong)value;
+				if (m_Value != b)
+				{
+					ValueTo(b);
+				}
+				Invalidate();
+			}
+		}
+		[Category("BitWork")]
+		public ulong ValueUlong
+		{
+			get { return (ulong)m_Value; }
+			set
+			{
+				ulong b = (ulong)value;
+				if (m_Value != b)
+				{
+					ValueTo(b);
+				}
+				Invalidate();
+			}
+		}
+		private void ValueTo(ulong value)
 		{
 			ulong v = 0;
 			bool b = false;
@@ -97,6 +201,8 @@ namespace BitWork
 			}
 			Debug.WriteLine("@" + BinToStr(m_Value));
 			if (b) OnUlongChanged(new UlongChangedArgs(m_Value));
+			Invalidate();
+
 		}
 		private string BinToStr(ulong v)
 		{
@@ -163,6 +269,7 @@ namespace BitWork
 			{
 				for(int i=0; i<8; i++) m_BitDisp[i].BitWidth = value;
 				ChkSize();
+				ChkLocation();
 			}
 		}
 		private int m_BitInter = 2;
@@ -174,6 +281,7 @@ namespace BitWork
 			{
 				for (int i = 0; i < 8; i++) m_BitDisp[i].BitInter = value;
 				ChkSize();
+				ChkLocation();
 			}
 		}
 		private ByteSize m_ByteSize =  ByteSize.Byte8;
@@ -258,7 +366,7 @@ namespace BitWork
 					for (int i = 0; i < 8; i++) m_BitDisp[i].Enabled = true;
 					break;
 			}
-			ValueToBin(m_Value);
+			ValueTo(m_Value);
 			/*
 			int x = 0;
 			*/
@@ -267,6 +375,14 @@ namespace BitWork
 
 		public BitDisp8byte()
 		{
+			this.SetStyle(
+			ControlStyles.DoubleBuffer |
+			ControlStyles.UserPaint |
+			ControlStyles.AllPaintingInWmPaint |
+			ControlStyles.ResizeRedraw |
+			ControlStyles.SupportsTransparentBackColor,
+			true);
+			this.UpdateStyles();
 			InitializeComponent();
 			int x = 0;
 			for(int i=0; i<8; i++)
@@ -275,18 +391,19 @@ namespace BitWork
 				this.Controls.Add(m_BitDisp[i]);
 				m_BitDisp[i].ByteChanged += (sender, e) => { ValueFromBin(); };
 			}
+			ChkSize();
+			ChkLocation();
+		}
+		public void ChkLocation()
+		{
+			int x = 0;
 			for (int i = 7; i >= 0; i--)
 			{
-				if (m_BitDisp[i].Visible == true)
-				{
-					m_BitDisp[i].Location = new Point(x, 0);
-					x += m_BitDisp[i].Width + 4;
-					if ((i % 2) == 0) x += 8;
-				}
+				m_BitDisp[i].Location = new Point(x, 0);
+				x += m_BitDisp[i].Width + 4;
+				if ((i % 2) == 0) x += 4;
 			}
-			ChkSize();
 		}
-
 		protected override void OnPaint(PaintEventArgs pe)
 		{
 			base.OnPaint(pe);
@@ -319,11 +436,171 @@ namespace BitWork
 			Debug.WriteLine("B" + BinToStr(v));
 			v = BitMask(v);
 			Debug.WriteLine("C" + BinToStr(v));
-			ValueToBin(v);
+			ValueTo(v);
 		}
 		public void BitRev()
 		{
-			ValueToBin(m_Value ^ 0xFFFF_FFFF_FFFF_FFFF);
+			ValueTo(m_Value ^ 0xFFFF_FFFF_FFFF_FFFF);
+		}
+		public void Add(ulong value)
+		{
+			ulong ret = 0;
+			switch (m_ByteSize)
+			{
+				case ByteSize.Byte1:
+					sbyte s = (sbyte)m_Value;
+					sbyte d = (sbyte)value;
+					s += d;
+					ret = (ulong)s;
+					break;
+				case ByteSize.Byte2:
+					short s2 = (short)m_Value;
+					short d2 = (short)value;
+					s2 += d2;
+					ret = (ulong)s2;
+					break;
+				case ByteSize.Byte4:
+					int s4 = (int)m_Value;
+					int d4 = (int)value;
+					s4 += d4;
+					ret = (ulong)s4;
+					break;
+				case ByteSize.Byte8:
+					long s8 = (long)m_Value;
+					long d8 = (long)value;
+					s8 += d8;
+					ret = (ulong)s8;
+					break;
+			}
+			ValueTo(ret);
+		}
+		public void Sub(ulong value)
+		{
+			ulong ret = 0;
+			switch (m_ByteSize)
+			{
+				case ByteSize.Byte1:
+					sbyte s = (sbyte)m_Value;
+					sbyte d = (sbyte)value;
+					s -= d;
+					ret = (ulong)s;
+					break;
+				case ByteSize.Byte2:
+					short s2 = (short)m_Value;
+					short d2 = (short)value;
+					s2 -= d2;
+					ret = (ulong)s2;
+					break;
+				case ByteSize.Byte4:
+					int s4 = (int)m_Value;
+					int d4 = (int)value;
+					s4 -= d4;
+					ret = (ulong)s4;
+					break;
+				case ByteSize.Byte8:
+					long s8 = (long)m_Value;
+					long d8 = (long)value;
+					s8 -= d8;
+					ret = (ulong)s8;
+					break;
+			}
+			ValueTo(ret);
+		}
+		public void And(ulong value)
+		{
+			ulong ret = 0;
+			switch (m_ByteSize)
+			{
+				case ByteSize.Byte1:
+					sbyte s = (sbyte)m_Value;
+					sbyte d = (sbyte)value;
+					s &= d;
+					ret = (ulong)s;
+					break;
+				case ByteSize.Byte2:
+					short s2 = (short)m_Value;
+					short d2 = (short)value;
+					s2 &= d2;
+					ret = (ulong)s2;
+					break;
+				case ByteSize.Byte4:
+					int s4 = (int)m_Value;
+					int d4 = (int)value;
+					s4 &= d4;
+					ret = (ulong)s4;
+					break;
+				case ByteSize.Byte8:
+					long s8 = (long)m_Value;
+					long d8 = (long)value;
+					s8 &= d8;
+					ret = (ulong)s8;
+					break;
+			}
+			ValueTo(ret);
+		}
+		public void Or(ulong value)
+		{
+			ulong ret = 0;
+			switch (m_ByteSize)
+			{
+				case ByteSize.Byte1:
+					sbyte s = (sbyte)m_Value;
+					sbyte d = (sbyte)value;
+					s |= d;
+					ret = (ulong)s;
+					break;
+				case ByteSize.Byte2:
+					short s2 = (short)m_Value;
+					short d2 = (short)value;
+					s2 |= d2;
+					ret = (ulong)s2;
+					break;
+				case ByteSize.Byte4:
+					int s4 = (int)m_Value;
+					int d4 = (int)value;
+					s4 |= d4;
+					ret = (ulong)s4;
+					break;
+				case ByteSize.Byte8:
+					long s8 = (long)m_Value;
+					long d8 = (long)value;
+					s8 |= d8;
+					ret = (ulong)s8;
+					break;
+			}
+			ValueTo(ret);
+		}
+		public void Xor(ulong value)
+		{
+			ulong ret = 0;
+			switch (m_ByteSize)
+			{
+				case ByteSize.Byte1:
+					sbyte s = (sbyte)m_Value;
+					sbyte d = (sbyte)value;
+					s ^= d;
+					ret = (ulong)s;
+					break;
+				case ByteSize.Byte2:
+					short s2 = (short)m_Value;
+					short d2 = (short)value;
+					s2 ^= d2;
+					ret = (ulong)s2;
+					break;
+				case ByteSize.Byte4:
+					int s4 = (int)m_Value;
+					int d4 = (int)value;
+					s4 ^= d4;
+					ret = (ulong)s4;
+					break;
+				case ByteSize.Byte8:
+					long s8 = (long)m_Value;
+					long d8 = (long)value;
+					s8 ^= d8;
+					ret = (ulong)s8;
+					break;
+			}
+			ValueTo(ret);
 		}
 	}
 	public class UlongChangedArgs : EventArgs

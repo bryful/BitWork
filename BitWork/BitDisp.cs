@@ -85,7 +85,14 @@ namespace BitWork
 		}
 		public BitDisp()
 		{
-			
+			this.SetStyle(
+			ControlStyles.DoubleBuffer |
+			ControlStyles.UserPaint |
+			ControlStyles.AllPaintingInWmPaint |
+			ControlStyles.ResizeRedraw |
+			ControlStyles.SupportsTransparentBackColor,
+			true);
+			this.UpdateStyles();
 			InitializeComponent();
 			ChkSize();
 		}
@@ -112,17 +119,23 @@ namespace BitWork
 				for (int i = 0; i < 8; i++)
 				{
 					Rectangle rct = new Rectangle(
-						this.Width  - (m_BitWidth+ m_BitInter) * (i+1),
+						this.Width - (m_BitWidth + m_BitInter) * (i + 1),
 						m_BitInter,
 						m_BitWidth,
 						m_BitWidth
 						);
-					if ((b & 0x1) ==0x1)
+					if (((b & 0x1) ==0x1)&&(this.Enabled))
 					{
 						g.FillRectangle(sb, rct);
 					}
 					else
 					{
+						rct = new Rectangle(
+							rct.Left,
+							rct.Top,
+							rct.Width-1,
+							rct.Height-1
+						);
 						g.DrawRectangle(p, rct);
 					}
 					b >>= 1;

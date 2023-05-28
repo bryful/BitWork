@@ -38,11 +38,6 @@ namespace BitWork
 			{
 				bitDisp8byte1.ByteSize = (ByteSize)(tglByteSize.Tags[tglByteSize.Index]);
 			}
-
-			tglSigned.IndexChanged += (sender, e) =>
-			{
-				BinToStr();
-			};
 			bitDisp8byte1.UlongChanged += (sender, e) =>
 			{
 				BinToStr();
@@ -51,6 +46,44 @@ namespace BitWork
 			btnRev.Click += (sender, e) => { bitDisp8byte1.BitRev(); };
 			btnShiftLeft.Click += (sender, e) => { bitDisp8byte1.BitShift(true); };
 			btnShiftRight.Click += (sender, e) => { bitDisp8byte1.BitShift(false); };
+
+			bitDisp8byte1.UlongChanged += (sender, e) =>
+			{
+				tbDec.Value = bitDisp8byte1.Value;
+				tbDecS.Value = bitDisp8byte1.Value;
+				tbHex.Value = bitDisp8byte1.Value;
+				tbBin.Value = bitDisp8byte1.Value;
+
+			};
+			tbDec.ValueChanged += (sender, e) => { bitDisp8byte1.Value = tbDec.Value; };
+			tbDecS.ValueChanged += (sender, e) => { bitDisp8byte1.Value = tbDecS.Value; };
+			tbHex.ValueChanged += (sender, e) => { bitDisp8byte1.Value = tbHex.Value; };
+			tbBin.ValueChanged += (sender, e) => { bitDisp8byte1.Value = tbBin.Value; };
+
+			tbCalc.ValueChanged += (sender, e) =>
+			{
+				if (rbAdd.Checked)
+				{
+					bitDisp8byte1.Add(tbCalc.Value);
+				}
+				else if (rbSub.Checked)
+				{
+					bitDisp8byte1.Sub(tbCalc.Value);
+				}
+				else if (rbAdd.Checked)
+				{
+					bitDisp8byte1.And(tbCalc.Value);
+				}
+				else if (rbOr.Checked)
+				{
+					bitDisp8byte1.Or(tbCalc.Value);
+				}
+				else if (rbXor.Checked)
+				{
+					bitDisp8byte1.Xor(tbCalc.Value);
+				}
+			};
+
 			Command(Environment.GetCommandLineArgs().Skip(1).ToArray(), PIPECALL.StartupExec);
 		}
 		// **********************************************************
@@ -84,7 +117,6 @@ namespace BitWork
 					ret += arg;
 				}
 			}
-			tbDec.Text = ret;
 		}
 		// **********************************************************
 		protected override void OnDragEnter(DragEventArgs drgevent)
@@ -137,6 +169,7 @@ namespace BitWork
 			ulong uv = bitDisp8byte1.Value;
 			string vdec = "";
 			string hdec = "";
+			/*
 			if (tglSigned.Index == 0)
 			{
 				string minus = "";
@@ -195,8 +228,9 @@ namespace BitWork
 						break;
 				}
 			}
-			tbDec.Text = $"{vdec}";
-			tbHex.Text = $"{hdec}";
+			*/
+			//tbDec.Text = $"{vdec}";
+			//tbHex.Text = $"{hdec}";
 		}
 		// **********************************************************
 		private ulong? StrToValue(string s)
@@ -239,6 +273,11 @@ namespace BitWork
 					break;
 			}
 			return ret;
+		}
+
+		private void MainForm_Load(object sender, EventArgs e)
+		{
+
 		}
 		// **********************************************************
 	}
